@@ -12,8 +12,8 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"myContainer/constant"
-	"myContainer/container"
+	"github.com/aspirshar/myContainer/constant"
+	"github.com/aspirshar/myContainer/container"
 
 	"github.com/pkg/errors"
 

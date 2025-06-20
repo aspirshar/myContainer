@@ -2,7 +2,7 @@ package container
 
 import (
 	"fmt"
-	"myContainer/constant"
+	"github.com/aspirshar/myContainer/constant"
 	"os"
 	"os/exec"
 	"path"

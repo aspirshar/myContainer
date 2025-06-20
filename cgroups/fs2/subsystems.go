@@ -1,7 +1,7 @@
 package fs2
 
 import (
-	"mydocker/cgroups/resource"
+	"github.com/aspirshar/myContainer/cgroups/resource"
 )
 
 var Subsystems = []resource.Subsystem{

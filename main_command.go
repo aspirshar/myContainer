@@ -2,17 +2,17 @@ package main
 
 import (
 	"fmt"
-	"myContainer/cgroups/resource"
-	"myContainer/network"
+	"github.com/aspirshar/myContainer/cgroups/resource"
+	"github.com/aspirshar/myContainer/network"
 	"os"
 
-	"myContainer/container"
+	"github.com/aspirshar/myContainer/container"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
 
-var runCommand = cli.Command{
+var RunCommand = cli.Command{
 	Name: "run",
 	Usage: `Create a container with namespace and cgroups limit
 			myContainer run -it [command]

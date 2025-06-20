@@ -4,11 +4,13 @@ import (
 	"os"
 	"path"
 	"testing"
+
+	"github.com/aspirshar/myContainer/cgroups/resource"
 )
 
 func TestMemoryCgroup(t *testing.T) {
 	memSubSys := MemorySubSystem{}
-	resConfig := &ResourceConfig{
+	resConfig := &resource.ResourceConfig{
 		MemoryLimit: "1000m",
 	}
 	testCgroup := "testmemlimit"
@@ -19,11 +21,11 @@ func TestMemoryCgroup(t *testing.T) {
 	stat, _ := os.Stat(path.Join(findCgroupMountpoint("memory"), testCgroup))
 	t.Logf("cgroup stats: %+v", stat)
 
-	if err := memSubSys.Apply(testCgroup, os.Getpid(), resConfig); err != nil {
+	if err := memSubSys.Apply(testCgroup, os.Getpid()); err != nil {
 		t.Fatalf("cgroup Apply %v", err)
 	}
 	// 将进程移回到根Cgroup节点
-	if err := memSubSys.Apply("", os.Getpid(), resConfig); err != nil {
+	if err := memSubSys.Apply("", os.Getpid()); err != nil {
 		t.Fatalf("cgroup Apply %v", err)
 	}
 

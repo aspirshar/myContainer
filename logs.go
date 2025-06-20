@@ -5,7 +5,7 @@ import (
 	"io"
 	"os"
 
-	"myContainer/container"
+	"github.com/aspirshar/myContainer/container"
 
 	log "github.com/sirupsen/logrus"
 )

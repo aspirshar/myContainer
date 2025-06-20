@@ -3,14 +3,14 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"myContainer/network"
+	"github.com/aspirshar/myContainer/network"
 	"os"
 	"path"
 	"strconv"
 	"syscall"
 
-	"myContainer/constant"
-	"myContainer/container"
+	"github.com/aspirshar/myContainer/constant"
+	"github.com/aspirshar/myContainer/container"
 
 	"github.com/pkg/errors"
 

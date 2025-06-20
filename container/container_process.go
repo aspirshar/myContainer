@@ -2,8 +2,8 @@ package container
 
 import (
 	"fmt"
-	"myContainer/constant"
-	"myContainer/utils"
+	"github.com/aspirshar/myContainer/constant"
+	"github.com/aspirshar/myContainer/utils"
 	"os"
 	"os/exec"
 	"syscall"

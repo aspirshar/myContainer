@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
-	"myContainer/constant"
+	"github.com/aspirshar/myContainer/constant"
 	"os"
 	"path"
 	"strconv"

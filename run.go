@@ -1,10 +1,10 @@
 package main
 
 import (
-	"myContainer/cgroups"
-	"myContainer/cgroups/resource"
-	"myContainer/container"
-	"myContainer/network"
+	"github.com/aspirshar/myContainer/cgroups"
+	"github.com/aspirshar/myContainer/cgroups/resource"
+	"github.com/aspirshar/myContainer/container"
+	"github.com/aspirshar/myContainer/network"
 	"os"
 	"strconv"
 	"strings"

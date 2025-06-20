@@ -1,7 +1,7 @@
 package main
 
 import (
-	"myContainer/utils"
+	"github.com/aspirshar/myContainer/utils"
 	"os/exec"
 
 	"github.com/pkg/errors"

@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
+	"github.com/aspirshar/myContainer/config"
 	log "github.com/sirupsen/logrus"
-
 	"github.com/urfave/cli"
 )
 
@@ -17,7 +17,7 @@ func main() {
 
 	app.Commands = []cli.Command{
 		initCommand,
-		runCommand,
+		RunCommand,
 		commitCommand,
 		listCommand,
 		logCommand,
@@ -29,10 +29,15 @@ func main() {
 
 	app.Before = func(context *cli.Context) error {
 		// 设置日志输出格式
-		// Log as JSON instead of the default ASCII formatter.
 		log.SetFormatter(&log.JSONFormatter{})
-
 		log.SetOutput(os.Stdout)
+
+		// 初始化配置
+		if err := config.Init(); err != nil {
+			log.Errorf("Failed to initialize config: %v", err)
+			return err
+		}
+
 		return nil
 	}
 

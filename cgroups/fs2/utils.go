@@ -2,11 +2,11 @@ package fs2
 
 import (
 	"fmt"
-	"myContainer/constant"
 	"os"
 	"path"
 	"strconv"
 
+	"github.com/aspirshar/myContainer/constant"
 	"github.com/pkg/errors"
 )
 

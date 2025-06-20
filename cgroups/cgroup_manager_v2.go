@@ -1,8 +1,8 @@
 package cgroups
 
 import (
-	"myContainer/cgroups/fs2"
-	"myContainer/cgroups/resource"
+	"github.com/aspirshar/myContainer/cgroups/fs2"
+	"github.com/aspirshar/myContainer/cgroups/resource"
 
 	"github.com/sirupsen/logrus"
 )

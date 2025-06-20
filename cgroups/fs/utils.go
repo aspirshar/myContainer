@@ -6,7 +6,7 @@ import (
 	"path"
 	"strings"
 
-	"myContainer/constant"
+	"github.com/aspirshar/myContainer/constant"
 
 	log "github.com/sirupsen/logrus"
 

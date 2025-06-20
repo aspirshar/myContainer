@@ -1,7 +1,7 @@
 package cgroups
 
 import (
-	"myContainer/cgroups/resource"
+	"github.com/aspirshar/myContainer/cgroups/resource"
 
 	log "github.com/sirupsen/logrus"
 )

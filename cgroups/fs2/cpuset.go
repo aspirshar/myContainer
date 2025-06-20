@@ -2,10 +2,11 @@ package fs2
 
 import (
 	"fmt"
-	"myContainer/cgroups/resource"
-	"myContainer/constant"
 	"os"
 	"path"
+
+	"github.com/aspirshar/myContainer/cgroups/resource"
+	"github.com/aspirshar/myContainer/constant"
 )
 
 type CpusetSubSystem struct {

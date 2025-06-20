@@ -8,9 +8,9 @@ import (
 	"path"
 	"strings"
 
-	"myContainer/container"
+	"github.com/aspirshar/myContainer/container"
 	// 需要导入nsenter包，以触发C代码
-	_ "myContainer/nsenter"
+	_ "github.com/aspirshar/myContainer/nsenter"
 
 	log "github.com/sirupsen/logrus"
 )

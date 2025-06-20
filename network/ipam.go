@@ -3,7 +3,7 @@ package network
 import (
 	"encoding/json"
 	"fmt"
-	"myContainer/constant"
+	"github.com/aspirshar/myContainer/constant"
 	"net"
 	"os"
 	"path"

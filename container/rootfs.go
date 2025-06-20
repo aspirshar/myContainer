@@ -1,7 +1,7 @@
 package container
 
 import (
-	"myContainer/utils"
+	"github.com/aspirshar/myContainer/utils"
 	"os"
 	"os/exec"
 
