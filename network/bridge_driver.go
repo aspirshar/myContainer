@@ -179,9 +179,13 @@ func (d *BridgeNetworkDriver) deleteBridge(n *Network) error {
 func createBridgeInterface(bridgeName string) error {
 	// 先检查是否己经存在了这个同名的Bridge设备
 	_, err := net.InterfaceByName(bridgeName)
-	// 如果已经存在或者报错则返回创建错
-	// errNoSuchInterface这个错误未导出也没提供判断方法，只能判断字符串了。。
-	if err == nil || !strings.Contains(err.Error(), "no such network interface") {
+	// 如果接口已经存在，则不需要创建
+	if err == nil {
+		return nil
+	}
+	
+	// 如果错误信息不包含"no such network interface"，说明是其他错误
+	if !strings.Contains(err.Error(), "no such network interface") {
 		return err
 	}
 

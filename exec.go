@@ -42,6 +42,8 @@ func ExecContainer(containerId string, comArray []string) {
 	// 把指定PID进程的环境变量传递给新启动的进程，实现通过exec命令也能查询到容器的环境变量
 	containerEnvs := getEnvsByPid(pid)
 	cmd.Env = append(os.Environ(), containerEnvs...)
+	// 设置 MYCONTAINER_ROOT 环境变量，保证子进程路径一致
+	cmd.Env = append(cmd.Env, "MYCONTAINER_ROOT="+os.Getenv("MYCONTAINER_ROOT"))
 
 	if err = cmd.Run(); err != nil {
 		log.Errorf("Exec container %s error %v", containerId, err)

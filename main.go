@@ -32,6 +32,11 @@ func main() {
 		log.SetFormatter(&log.JSONFormatter{})
 		log.SetOutput(os.Stdout)
 
+		// 对于 init 命令，跳过配置初始化，因为它在容器内部执行
+		if len(os.Args) > 1 && os.Args[1] == "init" {
+			return nil
+		}
+
 		// 初始化配置
 		if err := config.Init(); err != nil {
 			log.Errorf("Failed to initialize config: %v", err)

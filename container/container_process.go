@@ -66,6 +66,7 @@ func NewParentProcess(tty bool, volume, containerId, imageName string, envSlice 
 		cmd.Stderr = stdLogFile
 	}
 	cmd.Env = append(os.Environ(), envSlice...)
+	cmd.Env = append(cmd.Env, "MYCONTAINER_ROOT="+os.Getenv("MYCONTAINER_ROOT"))
 	cmd.ExtraFiles = []*os.File{readPipe}
 	NewWorkSpace(containerId, imageName, volume)
 	cmd.Dir = utils.GetMerged(containerId)

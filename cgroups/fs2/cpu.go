@@ -7,7 +7,6 @@ import (
 	"strconv"
 
 	"github.com/aspirshar/myContainer/cgroups/resource"
-	"github.com/aspirshar/myContainer/constant"
 )
 
 type CpuSubSystem struct {
@@ -36,7 +35,8 @@ func (s *CpuSubSystem) Set(cgroupPath string, res *resource.ResourceConfig) erro
 	if res.CpuCfsQuota != 0 {
 		// cpu.cfs_quota_us 则根据用户传递的参数来控制，比如参数为20，就是限制为20%CPU，所以把cpu.cfs_quota_us设置为cpu.cfs_period_us的20%就行
 		// 这里只是简单的计算了下，并没有处理一些特殊情况，比如负数什么的
-		if err = os.WriteFile(path.Join(subCgroupPath, "cpu.max"), []byte(fmt.Sprintf("%s %s", strconv.Itoa(PeriodDefault/Percent*res.CpuCfsQuota), PeriodDefault)), constant.Perm0644); err != nil {
+		val := fmt.Sprintf("%s %d", strconv.Itoa(PeriodDefault/Percent*res.CpuCfsQuota), PeriodDefault)
+		if err = os.WriteFile(path.Join(subCgroupPath, "cpu.max"), []byte(val), 0644); err != nil {
 			return fmt.Errorf("set cgroup cpu share fail %v", err)
 		}
 	}

@@ -24,11 +24,14 @@ var (
 // Init 初始化配置
 func Init() error {
 	var err error
-
-	// 获取项目根目录
-	RootDir, err = filepath.Abs(filepath.Dir(os.Args[0]))
-	if err != nil {
-		return err
+	rootFromEnv := os.Getenv("MYCONTAINER_ROOT")
+	if rootFromEnv != "" {
+		RootDir = rootFromEnv
+	} else {
+		RootDir, err = os.Getwd()
+		if err != nil {
+			return err
+		}
 	}
 
 	// 设置镜像和容器层目录

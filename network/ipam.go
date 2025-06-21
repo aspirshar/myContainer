@@ -28,22 +28,19 @@ var ipAllocator = &IPAM{
 
 // Allocate 在网段中分配一个可用的 IP 地址
 func (ipam *IPAM) Allocate(subnet *net.IPNet) (ip net.IP, err error) {
-	// 存放网段中地址分配信息的数组
-	ipam.Subnets = &map[string]string{}
-
 	// 从文件中加载已经分配的网段信息
 	err = ipam.load()
 	if err != nil {
 		return nil, errors.Wrap(err, "load subnet allocation info error")
 	}
 	// net.IPNet.Mask.Size函数会返回网段的子网掩码的总长度和网段前面的固定位的长度
-	// 比如“127.0.0.0/8”网段的子网掩码是“255.0.0.0”
+	// 比如"127.0.0.0/8"网段的子网掩码是"255.0.0.0"
 	// 那么subnet.Mask.Size()的返回值就是前面255所对应的位数和总位数，即8和24
 	_, subnet, _ = net.ParseCIDR(subnet.String())
 	one, size := subnet.Mask.Size()
 	// 如果之前没有分配过这个网段，则初始化网段的分配配置
 	if _, exist := (*ipam.Subnets)[subnet.String()]; !exist {
-		// ／用“0”填满这个网段的配置，uint8(size - one ）表示这个网段中有多少个可用地址
+		// ／用"0"填满这个网段的配置，uint8(size - one )表示这个网段中有多少个可用地址
 		// size - one是子网掩码后面的网络位数，2^(size - one)表示网段中的可用IP数
 		// 而2^(size - one)等价于1 << uint8(size - one)
 		// 左移一位就是扩大两倍
@@ -54,9 +51,9 @@ func (ipam *IPAM) Allocate(subnet *net.IPNet) (ip net.IP, err error) {
 	}
 	// 遍历网段的位图数组
 	for c := range (*ipam.Subnets)[subnet.String()] {
-		// 找到数组中为“0”的项和数组序号，即可以分配的 IP
+		// 找到数组中为"0"的项和数组序号，即可以分配的 IP
 		if (*ipam.Subnets)[subnet.String()][c] == '0' {
-			// 设置这个为“0”的序号值为“1” 即标记这个IP已经分配过了
+			// 设置这个为"0"的序号值为"1" 即标记这个IP已经分配过了
 			// Go 的字符串，创建之后就不能修改 所以通过转换成 byte 数组，修改后再转换成字符串赋值
 			ipalloc := []byte((*ipam.Subnets)[subnet.String()])
 			ipalloc[c] = '1'
@@ -121,6 +118,10 @@ func (ipam *IPAM) load() error {
 	if _, err := os.Stat(ipam.SubnetAllocatorPath); err != nil {
 		if !os.IsNotExist(err) {
 			return err
+		}
+		// 如果文件不存在，初始化一个空的 Subnets map
+		if ipam.Subnets == nil {
+			ipam.Subnets = &map[string]string{}
 		}
 		return nil
 	}
