@@ -70,12 +70,27 @@ func createLower(containerID, imageName string) {
 	}
 	// 不存在则创建目录并将image.tar解压到lower文件夹中
 	if !exist {
+		log.Infof("Creating lower directory at %s", lowerPath)
 		if err = os.MkdirAll(lowerPath, 0777); err != nil {
-			log.Errorf("Mkdir dir %s error. %v", lowerPath, err)
+			log.Errorf("Failed to create lower directory %s: %v", lowerPath, err)
+			return
 		}
-		if _, err = exec.Command("tar", "-xvf", imagePath, "-C", lowerPath).CombinedOutput(); err != nil {
-			log.Errorf("Untar dir %s error %v", lowerPath, err)
+
+		// 检查镜像文件是否存在
+		if _, err := os.Stat(imagePath); err != nil {
+			log.Errorf("Image file %s not found: %v", imagePath, err)
+			return
 		}
+
+		log.Infof("Extracting image %s to %s", imagePath, lowerPath)
+		cmd := exec.Command("tar", "-xvf", imagePath, "-C", lowerPath)
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			log.Errorf("Failed to extract image %s to %s: %v\nCommand output: %s", 
+				imagePath, lowerPath, err, string(output))
+			return
+		}
+		log.Infof("Successfully extracted image to %s", lowerPath)
 	}
 }
 

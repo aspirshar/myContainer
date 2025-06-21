@@ -16,6 +16,9 @@ var (
 	ImagePath  string
 	RootPath   string
 	ImagesPath string // 用于存储容器镜像的路径
+	
+	// 容器信息存储路径
+	ContainerInfoPath string
 )
 
 // Init 初始化配置
