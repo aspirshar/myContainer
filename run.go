@@ -1,13 +1,14 @@
 package main
 
 import (
+	"encoding/json"
 	"github.com/aspirshar/myContainer/cgroups"
 	"github.com/aspirshar/myContainer/cgroups/resource"
 	"github.com/aspirshar/myContainer/container"
 	"github.com/aspirshar/myContainer/network"
+	"github.com/aspirshar/myContainer/utils"
 	"os"
 	"strconv"
-	"strings"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -85,7 +86,7 @@ func Run(tty bool, comArray, envSlice []string, res *resource.ResourceConfig, vo
 		}
 
 		// 清理工作
-		container.DeleteWorkSpace(containerId, volume)
+		utils.DeleteWorkSpace(utils.GetRoot(containerId), volume)
 		container.DeleteContainerInfo(containerId)
 		if net != "" {
 			network.Disconnect(net, containerInfo)
@@ -98,8 +99,12 @@ func Run(tty bool, comArray, envSlice []string, res *resource.ResourceConfig, vo
 
 // sendInitCommand 通过writePipe将指令发送给子进程
 func sendInitCommand(comArray []string, writePipe *os.File) {
-	command := strings.Join(comArray, " ")
-	log.Infof("command all is %s", command)
-	_, _ = writePipe.WriteString(command)
+	command, err := json.Marshal(comArray)
+	if err != nil {
+		log.Errorf("marshal command failed, err: %v", err)
+		return
+	}
+	log.Infof("command all is %s", string(command))
+	_, _ = writePipe.Write(command)
 	_ = writePipe.Close()
 }

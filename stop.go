@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/aspirshar/myContainer/network"
+	"github.com/aspirshar/myContainer/utils"
 	"os"
 	"path"
 	"strconv"
@@ -32,7 +33,12 @@ func stopContainer(containerId string) {
 	// 2.发送SIGTERM信号
 	if err = syscall.Kill(pidInt, syscall.SIGTERM); err != nil {
 		log.Errorf("Stop container %s error %v", containerId, err)
-		return
+		// 如果进程不存在，直接更新状态为STOP
+		if err == syscall.ESRCH {
+			log.Infof("Process %d does not exist, updating container status to STOP", pidInt)
+		} else {
+			return
+		}
 	}
 	// 3.修改容器信息，将容器置为STOP状态，并清空PID
 	containerInfo.Status = container.STOP
@@ -68,6 +74,7 @@ func removeContainer(containerId string, force bool) {
 	containerInfo, err := getInfoByContainerId(containerId)
 	if err != nil {
 		log.Errorf("Get container %s info error %v", containerId, err)
+		fmt.Printf("Error: Container '%s' does not exist\n", containerId)
 		return
 	}
 
@@ -78,24 +85,39 @@ func removeContainer(containerId string, force bool) {
 			log.Errorf("Remove container [%s]'s config failed, detail: %v", containerId, err)
 			return
 		}
-		container.DeleteWorkSpace(containerId, containerInfo.Volume)
+		utils.DeleteWorkSpace(utils.GetRoot(containerId), containerInfo.Volume)
 		if containerInfo.NetworkName != "" { // 清理网络资源
 			if err = network.Disconnect(containerInfo.NetworkName, containerInfo); err != nil {
 				log.Errorf("Remove container [%s]'s config failed, detail: %v", containerId, err)
 				return
 			}
 		}
+		fmt.Printf("Container '%s' has been removed\n", containerId)
 	case container.RUNNING: // RUNNING 状态容器如果指定了 force 则先 stop 然后再删除
 		if !force {
 			log.Errorf("Couldn't remove running container [%s], Stop the container before attempting removal or"+
 				" force remove", containerId)
+			fmt.Printf("Error: Couldn't remove running container '%s'. Stop the container before attempting removal or force remove with -f\n", containerId)
 			return
 		}
 		log.Infof("force delete running container [%s]", containerId)
+		fmt.Printf("Force removing running container '%s'...\n", containerId)
 		stopContainer(containerId)
-		removeContainer(containerId, force)
+		// 重新加载容器信息
+		containerInfo, err = getInfoByContainerId(containerId)
+		if err != nil {
+			log.Errorf("Get container %s info error %v", containerId, err)
+			return
+		}
+		if containerInfo.Status == container.STOP {
+			removeContainer(containerId, force)
+		} else {
+			log.Errorf("Couldn't remove container, stop failed")
+			fmt.Printf("Error: Failed to stop container '%s'\n", containerId)
+		}
 	default:
 		log.Errorf("Couldn't remove container,invalid status %s", containerInfo.Status)
+		fmt.Printf("Error: Couldn't remove container '%s', invalid status: %s\n", containerId, containerInfo.Status)
 		return
 	}
 }

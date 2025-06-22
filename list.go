@@ -3,8 +3,11 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/aspirshar/myContainer/constant"
 	"os"
 	"path"
+	"strconv"
+	"syscall"
 	"text/tabwriter"
 
 	"github.com/aspirshar/myContainer/container"
@@ -55,17 +58,42 @@ func ListContainers() {
 
 func getContainerInfo(file os.DirEntry) (*container.Info, error) {
 	configFileDir := fmt.Sprintf(container.InfoLocFormat, file.Name())
-	configFileDir = path.Join(configFileDir, container.ConfigName)
+	configFilePath := path.Join(configFileDir, container.ConfigName)
 	// 读取容器配置文件
-	content, err := os.ReadFile(configFileDir)
+	content, err := os.ReadFile(configFilePath)
 	if err != nil {
-		log.Errorf("read file %s error %v", configFileDir, err)
+		log.Errorf("read file %s error %v", configFilePath, err)
 		return nil, err
 	}
 	info := new(container.Info)
 	if err = json.Unmarshal(content, info); err != nil {
 		log.Errorf("json unmarshal error %v", err)
 		return nil, err
+	}
+
+	// 如果容器状态为 RUNNING，则检查进程是否存在
+	if info.Status == container.RUNNING {
+		pid, err := strconv.Atoi(info.Pid)
+		if err != nil {
+			log.Errorf("convert pid from string to int error %v", err)
+			return nil, err
+		}
+		// 向进程发送 signal 0，如果返回 ESRCH 错误，则说明进程不存在
+		if err := syscall.Kill(pid, 0); err == syscall.ESRCH {
+			log.Infof("container %s process %d not exist, update status to stopped", info.Id, pid)
+			info.Status = container.STOP
+			info.Pid = " "
+			// 将更新后的信息写回 config.json
+			newContent, err := json.Marshal(info)
+			if err != nil {
+				log.Errorf("json marshal error %v", err)
+				return nil, err
+			}
+			if err := os.WriteFile(configFilePath, newContent, constant.Perm0622); err != nil {
+				log.Errorf("write file %s error %v", configFilePath, err)
+				return nil, err
+			}
+		}
 	}
 
 	return info, nil

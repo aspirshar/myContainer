@@ -1,11 +1,11 @@
 package container
 
 import (
+	"encoding/json"
 	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
 	"syscall"
 
 	"github.com/pkg/errors"
@@ -39,7 +39,6 @@ func RunContainerInitProcess() error {
 const fdIndex = 3
 
 func readUserCommand() []string {
-
 	pipe := os.NewFile(uintptr(fdIndex), "pipe")
 	defer pipe.Close()
 	msg, err := io.ReadAll(pipe)
@@ -47,8 +46,13 @@ func readUserCommand() []string {
 		log.Errorf("init read pipe error %v", err)
 		return nil
 	}
-	msgStr := string(msg)
-	return strings.Split(msgStr, " ")
+	var comArray []string
+	err = json.Unmarshal(msg, &comArray)
+	if err != nil {
+		log.Errorf("unmarshal command failed, err: %v", err)
+		return nil
+	}
+	return comArray
 }
 
 /*

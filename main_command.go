@@ -26,9 +26,9 @@ var RunCommand = cli.Command{
 			Name:  "mem",
 			Usage: "memory limit,e.g.: -mem 100m",
 		},
-		cli.StringFlag{
+		cli.Float64Flag{
 			Name:  "cpu",
-			Usage: "cpu quota,e.g.: -cpu 100", // 限制进程 cpu 使用率
+			Usage: "cpu quota,e.g.: -cpu 0.5", // 限制进程 cpu 使用率
 		},
 		cli.StringFlag{
 			Name:  "cpuset",
@@ -93,7 +93,7 @@ var RunCommand = cli.Command{
 		resConf := &resource.ResourceConfig{
 			MemoryLimit: context.String("mem"),
 			CpuSet:      context.String("cpuset"),
-			CpuCfsQuota: context.Int("cpu"),
+			CpuCfsQuota: int(context.Float64("cpu") * 100), // 将浮点数转换为整数百分比
 		}
 		log.Info("resConf:", resConf)
 		volume := context.String("v")
