@@ -56,6 +56,48 @@ func RecordContainerInfo(containerPID int, commandArray []string, containerName,
 	return containerInfo, nil
 }
 
+// GetContainerInfoByName 通过容器名称获取容器信息
+func GetContainerInfoByName(containerName string) (*Info, error) {
+	// 读取存放容器信息目录下的所有文件
+	files, err := os.ReadDir(InfoLoc)
+	if err != nil {
+		return nil, errors.WithMessagef(err, "read dir %s failed", InfoLoc)
+	}
+	
+	// 遍历所有容器目录，查找匹配的容器名称
+	for _, file := range files {
+		configFileDir := fmt.Sprintf(InfoLocFormat, file.Name())
+		configFilePath := path.Join(configFileDir, ConfigName)
+		
+		// 读取容器配置文件
+		content, err := os.ReadFile(configFilePath)
+		if err != nil {
+			continue // 跳过无法读取的配置文件
+		}
+		
+		info := new(Info)
+		if err = json.Unmarshal(content, info); err != nil {
+			continue // 跳过无法解析的配置文件
+		}
+		
+		// 如果找到匹配的容器名称，返回容器信息
+		if info.Name == containerName {
+			return info, nil
+		}
+	}
+	
+	return nil, errors.Errorf("container with name '%s' not found", containerName)
+}
+
+// GetContainerIDByName 通过容器名称获取容器ID
+func GetContainerIDByName(containerName string) (string, error) {
+	info, err := GetContainerInfoByName(containerName)
+	if err != nil {
+		return "", err
+	}
+	return info.Id, nil
+}
+
 func DeleteContainerInfo(containerID string) error {
 	dirPath := fmt.Sprintf(InfoLocFormat, containerID)
 	if err := os.RemoveAll(dirPath); err != nil {

@@ -24,7 +24,7 @@ import (
 )
 
 var (
-	defaultNetworkPath = "/var/lib/mydocker/network/network/"
+	defaultNetworkPath = "/var/lib/mycontainer/network/network/"
 	drivers            = map[string]Driver{}
 )
 
@@ -200,7 +200,7 @@ func DeleteNetwork(networkName string) error {
 	return net.remove(defaultNetworkPath)
 }
 
-// Connect 连接容器到之前创建的网络 mydocker run -net testnet -p 8080:80 xxxx
+// Connect 连接容器到之前创建的网络 mycontainer run -net testnet -p 8080:80 xxxx
 func Connect(networkName string, info *container.Info) (net.IP, error) {
 	networks, err := loadNetwork()
 	if err != nil {
@@ -232,7 +232,7 @@ func Connect(networkName string, info *container.Info) (net.IP, error) {
 	if err = configEndpointIpAddressAndRoute(ep, info); err != nil {
 		return ip, err
 	}
-	// 配置端口映射信息，例如 mydocker run -p 8080:80
+	// 配置端口映射信息，例如 mycontainer run -p 8080:80
 	return ip, addPortMapping(ep)
 }
 

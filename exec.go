@@ -21,8 +21,20 @@ const (
 	EnvExecCmd = "mydocker_cmd"
 )
 
-func ExecContainer(containerId string, comArray []string) {
-	// 根据传进来的容器名获取对应的PID
+func ExecContainer(containerIdOrName string, comArray []string) {
+	// 首先尝试通过容器名称获取容器ID
+	containerId := containerIdOrName
+	containerInfo, err := container.GetContainerInfoByName(containerIdOrName)
+	if err != nil {
+		// 如果通过名称查找失败，假设输入的是容器ID，直接使用
+		log.Infof("Container name '%s' not found, treating as container ID", containerIdOrName)
+	} else {
+		// 如果通过名称找到了容器，使用其ID
+		containerId = containerInfo.Id
+		log.Infof("Found container '%s' with ID: %s", containerIdOrName, containerId)
+	}
+
+	// 根据传进来的容器ID获取对应的PID
 	pid, err := getPidByContainerId(containerId)
 	if err != nil {
 		log.Errorf("Exec container getContainerPidByName %s error %v", containerId, err)

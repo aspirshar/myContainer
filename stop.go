@@ -18,9 +18,25 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func stopContainer(containerId string) {
+func stopContainer(containerIdOrName string) {
+	// 首先尝试通过容器名称获取容器ID
+	containerId := containerIdOrName
+	containerInfo, err := container.GetContainerInfoByName(containerIdOrName)
+	if err != nil {
+		// 如果通过名称查找失败，假设输入的是容器ID，直接使用
+		log.Infof("Container name '%s' not found, treating as container ID", containerIdOrName)
+		containerInfo, err = getInfoByContainerId(containerIdOrName)
+		if err != nil {
+			log.Errorf("Get container %s info error %v", containerIdOrName, err)
+			return
+		}
+	} else {
+		// 如果通过名称找到了容器，使用其ID
+		containerId = containerInfo.Id
+		log.Infof("Found container '%s' with ID: %s", containerIdOrName, containerId)
+	}
+
 	// 1. 根据容器Id查询容器信息
-	containerInfo, err := getInfoByContainerId(containerId)
 	if err != nil {
 		log.Errorf("Get container %s info error %v", containerId, err)
 		return
@@ -70,12 +86,23 @@ func getInfoByContainerId(containerId string) (*container.Info, error) {
 	return &containerInfo, nil
 }
 
-func removeContainer(containerId string, force bool) {
-	containerInfo, err := getInfoByContainerId(containerId)
+func removeContainer(containerIdOrName string, force bool) {
+	// 首先尝试通过容器名称获取容器ID
+	containerId := containerIdOrName
+	containerInfo, err := container.GetContainerInfoByName(containerIdOrName)
 	if err != nil {
-		log.Errorf("Get container %s info error %v", containerId, err)
-		fmt.Printf("Error: Container '%s' does not exist\n", containerId)
-		return
+		// 如果通过名称查找失败，假设输入的是容器ID，直接使用
+		log.Infof("Container name '%s' not found, treating as container ID", containerIdOrName)
+		containerInfo, err = getInfoByContainerId(containerIdOrName)
+		if err != nil {
+			log.Errorf("Get container %s info error %v", containerIdOrName, err)
+			fmt.Printf("Error: Container '%s' does not exist\n", containerIdOrName)
+			return
+		}
+	} else {
+		// 如果通过名称找到了容器，使用其ID
+		containerId = containerInfo.Id
+		log.Infof("Found container '%s' with ID: %s", containerIdOrName, containerId)
 	}
 
 	switch containerInfo.Status {

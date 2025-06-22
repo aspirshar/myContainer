@@ -14,14 +14,14 @@ import (
 	"github.com/pkg/errors"
 )
 
-const ipamDefaultAllocatorPath = "/var/lib/mydocker/network/ipam/subnet.json"
+const ipamDefaultAllocatorPath = "/var/lib/mycontainer/network/ipam/subnet.json"
 
 type IPAM struct {
 	SubnetAllocatorPath string             // 分配文件存放位置
 	Subnets             *map[string]string // 网段和位图算法的数组 map, key 是网段， value 是分配的位图数组
 }
 
-// 初始化一个IPAM的对象，默认使用/var/run/mydocker/network/ipam/subnet.json作为分配信息存储位置
+// 初始化一个IPAM的对象，默认使用/var/lib/mycontainer/network/ipam/subnet.json作为分配信息存储位置
 var ipAllocator = &IPAM{
 	SubnetAllocatorPath: ipamDefaultAllocatorPath,
 }
@@ -136,6 +136,12 @@ func (ipam *IPAM) load() error {
 	if err != nil {
 		return errors.Wrap(err, "read subnet config file error")
 	}
+
+	// 重点：在 Unmarshal 之前，要先确保 ipam.Subnets 不是一个 nil 指针
+	if ipam.Subnets == nil {
+		ipam.Subnets = &map[string]string{}
+	}
+
 	err = json.Unmarshal(subnetJson[:n], ipam.Subnets)
 	return errors.Wrap(err, "err dump allocation info")
 }

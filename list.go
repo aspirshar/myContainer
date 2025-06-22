@@ -62,6 +62,13 @@ func getContainerInfo(file os.DirEntry) (*container.Info, error) {
 	// 读取容器配置文件
 	content, err := os.ReadFile(configFilePath)
 	if err != nil {
+		// 如果配置文件不存在，清理整个目录
+		if os.IsNotExist(err) {
+			log.Infof("Config file not found for container %s, cleaning up orphan directory", file.Name())
+			if removeErr := os.RemoveAll(configFileDir); removeErr != nil {
+				log.Errorf("Failed to remove orphan directory %s: %v", configFileDir, removeErr)
+			}
+		}
 		log.Errorf("read file %s error %v", configFilePath, err)
 		return nil, err
 	}
